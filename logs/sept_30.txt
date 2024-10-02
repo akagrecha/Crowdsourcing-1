@@ -1,0 +1,22 @@
+
+python main.py policy=averaging data_loader=no_context_data data_loader.params.est_type=logit data_loader.params.task="arena" policy.params.logits=True policy.params.apply_sigmoid=True "data_loader.params.model_list=[llama3,beluga,mistral,zephyr,starling,openorca,mistral1,hermes2,hermes25]" data_loader.params.datapath="data/Arena"
+python main.py policy=averaging data_loader=no_context_data data_loader.params.est_type=logit data_loader.params.task="arena_comb" policy.params.logits=True policy.params.apply_sigmoid=True "data_loader.params.model_list=[llama3,beluga,mistral,zephyr,starling,openorca,mistral1,hermes2,hermes25,dolphin]" data_loader.params.datapath="data/Arena"
+
+# Define common parameters for the policy
+$base_command = "python main.py --multirun"
+$policy_params = "policy=em_asym_bin 'policy.params.seed=range(5)'"
+$policy_params = "policy=averaging policy.params.logits=False"
+
+# Define data-related parameters
+$data_arena = "data_loader=no_context_data data_loader.params.task=`"arena`" data_loader.params.model_list=[llama3,beluga,mistral,zephyr,starling,openorca,mistral1,hermes2,hermes25] data_loader.params.datapath=`"data/Arena`""
+$data_truthfulqa = "data_loader=no_context_data data_loader.params.task=`"truthfulqa`" data_loader.params.model_list=[llama3,mistral,zephyr,starling,openorca,mistral1,hermes2,hermes25] data_loader.params.datapath=`"data/truthfulqa`""
+$data_arena_comb = "data_loader=no_context_data data_loader.params.task=`"arena_comb`" data_loader.params.model_list=[llama3,beluga,mistral,zephyr,starling,openorca,mistral1,hermes2,hermes25,dolphin] data_loader.params.datapath=`"data/Arena`""
+$data_arena_comb_70b = "data_loader=no_context_data data_loader.params.task=`"arena_comb`" data_loader.params.model_list=[hermes70B,llama370B,mixtral,athene,qwen272B] data_loader.params.datapath=`"data/Arena`""
+
+# Construct full commands
+$full_command = "$base_command $policy_params $data_arena data_loader.params.est_type=prob"
+$full_command = "$base_command $policy_params $data_truthfulqa"
+$full_command = "$base_command $policy_params $data_arena_comb data_loader.params.est_type=prob"
+$full_command = "$base_command $policy_params $data_arena_comb_70b data_loader.params.est_type=binary"
+
+Invoke-Expression $full_command

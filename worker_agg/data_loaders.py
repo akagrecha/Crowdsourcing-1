@@ -19,7 +19,7 @@ class NoContextData:
         self.model_list = model_list
         assert est_type in ['binary', 'prob', 'logit']
         self.est_type = est_type
-        assert task in ['halueval', 'truthfulqa', 'arena']
+        assert task in ['halueval', 'truthfulqa', 'arena', 'arena_comb']
         self.task = task
 
     def get_data(self):
@@ -28,14 +28,16 @@ class NoContextData:
         elif self.task == 'truthfulqa':
             filepath = Path(self.datapath) / "truthful_qa.json"
         elif self.task == 'arena':
-            filepath = Path(self.datapath) / "arena_binary.json"
+            filepath = Path(self.datapath) / "arena_hard_binary_short.json"
+        elif self.task == 'arena_comb':
+            filepath = Path(self.datapath) / "arena_binary_short_comb.json"
         with open(filepath) as fin:
             data = json.load(fin)
         ests = []
         outcomes = []
         for datap in data:
             if self.est_type == 'binary':
-                ests.append([datap[cllm][0]<=0.5 for cllm in self.model_list])
+                ests.append([datap[cllm][0]<0.5 for cllm in self.model_list])
             elif self.est_type == 'prob':
                 ests.append([datap[cllm][1] for cllm in self.model_list])
             elif self.est_type == 'logit':
